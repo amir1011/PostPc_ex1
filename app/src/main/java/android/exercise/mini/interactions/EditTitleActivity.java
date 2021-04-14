@@ -1,7 +1,9 @@
 package android.exercise.mini.interactions;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -20,6 +22,7 @@ public class EditTitleActivity extends AppCompatActivity {
   // `private boolean isEditing = false;`
   // in onCreate() set `this.isEditing` to `true` once the user starts editing, set to `false` once done editing
   // in onBackPressed() check `if(this.isEditing)` to understand what to do
+  private boolean isEditing = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +57,19 @@ public class EditTitleActivity extends AppCompatActivity {
 
       to complete (1.) & (2.), start by just changing visibility. only add animations after everything else is ready
        */
+      isEditing = true;
+      fabStartEdit.setVisibility(View.GONE);
+      animation(fabStartEdit, false);
+      fabEditDone.setVisibility(View.VISIBLE);
+      animation(fabEditDone, true);
+      textViewTitle.setVisibility(View.GONE);
+      editTextTitle.setText(textViewTitle.getText().toString());
+      editTextTitle.setVisibility(View.VISIBLE);
+      editTextTitle.requestFocus();
+      InputMethodManager inputMethMan =
+              (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+      inputMethMan.showSoftInput(editTextTitle, InputMethodManager.SHOW_IMPLICIT);
+      editTextTitle.setSelection(editTextTitle.getText().length());
     });
 
     // handle clicks on "done edit"
@@ -69,7 +85,36 @@ public class EditTitleActivity extends AppCompatActivity {
 
       to complete (1.) & (2.), start by just changing visibility. only add animations after everything else is ready
        */
+      isEditing = false;
+      fabEditDone.setVisibility(View.GONE);
+      animation(fabEditDone, false);
+      fabStartEdit.setVisibility(View.VISIBLE);
+      animation(fabStartEdit, true);
+      textViewTitle.setText(editTextTitle.getText().toString());
+
+      InputMethodManager inputMethMan =
+              (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+      inputMethMan.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+      editTextTitle.setVisibility(View.GONE);
+      textViewTitle.setVisibility(View.VISIBLE);
     });
+  }
+
+  private void animation(View v, boolean toShow){
+    if(toShow)
+    {
+      v.animate()
+              .alpha(1f)
+              .setDuration(300L)
+              .start();
+    }
+    else
+    {
+      v.animate()
+              .alpha(0f)
+              .setDuration(300L)
+              .start();
+    }
   }
 
   @Override
@@ -90,5 +135,33 @@ public class EditTitleActivity extends AppCompatActivity {
     to work with views, you will need to find them first.
     to find views call `findViewById()` in a same way like in `onCreate()`
      */
+    if(isEditing)
+    {
+//      findViewById(R.id.editTextPageTitle).setVisibility(View.GONE);
+//      findViewById(R.id.textViewPageTitle).setVisibility(View.VISIBLE);
+//      findViewById(R.id.fab_edit_done).setVisibility(View.GONE);
+//      animation(findViewById(R.id.fab_edit_done), false);
+//      findViewById(R.id.fab_start_edit).setVisibility(View.VISIBLE);
+//      animation(findViewById(R.id.fab_start_edit), true);
+      isEditing = false;
+      FloatingActionButton fabStartEdit = findViewById(R.id.fab_start_edit);
+      FloatingActionButton fabEditDone = findViewById(R.id.fab_edit_done);
+      TextView textViewTitle = findViewById(R.id.textViewPageTitle);
+      EditText editTextTitle = findViewById(R.id.editTextPageTitle);
+      fabEditDone.setVisibility(View.GONE);
+      animation(fabEditDone, false);
+      fabStartEdit.setVisibility(View.VISIBLE);
+      animation(fabStartEdit, true);
+      //todo maybe i need it after all
+//      InputMethodManager inputMethMan =
+//              (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+//      inputMethMan.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+      editTextTitle.setVisibility(View.GONE);
+      textViewTitle.setVisibility(View.VISIBLE);
+    }
+    else
+    {
+      super.onBackPressed();
+    }
   }
 }
